@@ -32,7 +32,6 @@ const FruitGame = () => {
     };
 
     const handleKeyPress = (event) => {
-        // Check for numbers, Backspace, Tab, and Enter key
         if (!/^[0-9]*$/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Tab' && event.key !== 'Enter') {
             event.preventDefault();
             alert("Please enter numbers only");
@@ -79,7 +78,7 @@ const FruitGame = () => {
     const calculateWinnings = (currentScore) => {
         return currentScore > 0 ? (Number(betAmount) * currentScore * 0.5) : 0; 
     };
-    
+
     const handleGridClick = (index) => {
         if (gameOver || !betStatus) return; // Prevent clicking if game is over or no active bet
     
@@ -102,7 +101,8 @@ const FruitGame = () => {
         } else {
             setGameOver(true);
             setBetStatus(false); // End the game on wrong grid
-            //alert("Game over");
+            setWinnings(0); // Set winnings to 0 on wrong grid click
+            console.log("Game over. Winnings set to 0.");
         }
     };
 
@@ -113,7 +113,6 @@ const FruitGame = () => {
         setBetStatus(false); 
         setWinnings(totalWinnings); // Set winnings for display
         setCashoutStatus(true); 
-        //alert("Cashout successful! Your winnings: " + totalWinnings);
     };
 
     useEffect(() => {
@@ -123,75 +122,77 @@ const FruitGame = () => {
     }, [betStatus]);
 
     return (
-        <div className='bg-gray-800 min-h-screen flex flex-col items-center p-5 text-white'>
-            <h1 className='text-4xl font-bold mb-4'>Money Gain</h1>
-            <div className='flex flex-col items-center mb-6'>
-                <h2 className='text-2xl mb-2'>Balance: Rs. {balance}</h2>
-                <div className='flex flex-row p-1 gap-2'>
-                <input
-                    type="text"
-                    placeholder="Add amount"
-                    value={amount}
-                    onChange={handleAmount}
-                    onKeyPress={handleKeyPress}
-                    className=' p-2 rounded  bg-gray-700 text-white'
-                />
-                <button 
-                    onClick={addAmount} 
-                    className='bg-green-500 text-white p-2 rounded hover:bg-green-600 transition'
-                >
-                    Add
-                </button>
+        <div className='bg-gray-800 min-h-screen flex flex-col items-center justify-center p-3 text-white'>
+            <h1 className='text-3xl font-bold mb-3'>Money Gain</h1>
+            <div className='flex flex-col items-center mb-4'>
+                <h2 className='text-xl mb-1'>Balance: Rs. {balance}</h2>
+                <div className='flex flex-row p-1 gap-1'>
+                    <input
+                        type="text"
+                        placeholder="Add amount"
+                        value={amount}
+                        onChange={handleAmount}
+                        onKeyPress={handleKeyPress}
+                        className='p-1 rounded bg-gray-700 text-white text-sm'
+                    />
+                    <button 
+                        onClick={addAmount} 
+                        className='bg-green-500 text-white p-1 rounded hover:bg-green-600 transition text-sm'
+                    >
+                        Add
+                    </button>
                 </div>
-                
             </div>
             
-            <h2 className="text-xl mb-2 score">Score: {score}</h2>
-            <h2 className='text-xl mb-4'>Winnings: Rs. {winnings}</h2>
-            <div className="grid grid-cols-4 gap-4 mb-4">
+            <h2 className="text-lg mb-1 score">Score: {score}</h2>
+            <h2 className='text-lg mb-2'>Winnings: Rs. {winnings}</h2>
+            <div className="grid grid-cols-4 gap-2 mb-3">
                 {Array.from({ length: totalGrids }, (_, index) => (
                     <div
                         key={index}
-                        className={`flex justify-center items-center border-2 border-gray-600 rounded-lg w-20 h-20 cursor-pointer ${revealedGrids[index] ? (fruitPositions.includes(index) ? 'bg-green-600' : 'bg-red-600') : 'bg-gray-900'}`}
+                        className={`flex justify-center items-center border-2 border-gray-600 rounded-lg w-16 h-16 cursor-pointer ${revealedGrids[index] ? (fruitPositions.includes(index) ? 'bg-green-600' : 'bg-red-600') : 'bg-gray-900'}`}
                         onClick={() => handleGridClick(index)}
                     >
-                        {revealedGrids[index] && (fruitPositions.includes(index) ? <img src="https://img.mensxp.com/media/content/2023/Aug/Image-3_Puneet-Superstar_Instagram_64d0e92f26850.jpeg?w=780&h=780&cc=1" className='h-full w-full' alt="" /> : <img src="https://exitplantx.com/images/Puneet-Superstar-image.jpg" className='h-full' alt="" />)}
+                        {revealedGrids[index] && (fruitPositions.includes(index) ? 
+                            <img src="https://img.mensxp.com/media/content/2023/Aug/Image-3_Puneet-Superstar_Instagram_64d0e92f26850.jpeg?w=780&h=780&cc=1" className='h-full w-full' alt="" /> 
+                            : <img src="https://exitplantx.com/images/Puneet-Superstar-image.jpg" className='h-full' alt="" />
+                        )}
                     </div>
                 ))}
             </div>
-            <div className='flex flex-row justify-center gap-2 items-center  p-1'>
-            <input
-                type="number"
-                placeholder="Enter bet amount"
-                onChange={handleBettingAmount}
-                value={betAmount}
-                className='border border-gray-400 p-2 rounded bg-gray-700 text-white'
-            />
-            <div className='flex flex-row p-1 gap-2'>
-            {gameOver ? (
-                <button 
-                    onClick={initializeGame} 
-                    className='bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition  flex justify-center items-center'
-                >
-                    Restart Game
-                </button>
-            ) : (
-                <button 
-                    onClick={handleBetStatus} 
-                    className='bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition flex justify-center items-center'
-                >
-                    BET
-                </button>
-            )}
-            {betStatus && gamestatus && !gameOver && (
-                <button 
-                    onClick={handleCashout} 
-                    className='bg-purple-500 text-white p-2 rounded hover:bg-purple-600 transition flex justify-center items-center'
-                >
-                    Cash Out
-                </button>
-            )}
-            </div>
+            <div className='flex flex-row sm:flex-col justify-center gap-1 items-center p-1'>
+                <input
+                    type="number"
+                    placeholder="Enter bet amount"
+                    onChange={handleBettingAmount}
+                    value={betAmount}
+                    className='border border-gray-400 p-1 rounded bg-gray-700 text-white text-sm'
+                />
+                <div className='flex flex-row p-1 gap-1'>
+                    {gameOver ? (
+                        <button 
+                            onClick={initializeGame} 
+                            className='bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition flex justify-center items-center text-sm'
+                        >
+                            Restart Game
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={handleBetStatus} 
+                            className='bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition flex justify-center items-center text-sm'
+                        >
+                            BET
+                        </button>
+                    )}
+                    {betStatus && gamestatus && !gameOver && (
+                        <button 
+                            onClick={handleCashout} 
+                            className='bg-purple-500 text-white p-1 rounded hover:bg-purple-600 transition flex justify-center items-center text-sm'
+                        >
+                            Cash Out
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
