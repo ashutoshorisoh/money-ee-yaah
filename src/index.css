@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns of equal width */
+  gap: 10px; /* Space between grids */
+}
+
+.grid-item {
+  background-color: #1a1a1a; /* Dark background for all grid items */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px; /* Base font size */
+  cursor: pointer; /* Changes cursor to pointer */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.grid-item.fruit {
+  background-color: #4CAF50; /* Green for fruit found */
+  color: white; /* Text color */
+}
+
+.grid-item.no-fruit {
+  background-color: #f44336; /* Red for no fruit */
+  color: white; /* Text color */
+}
+
+.score {
+  display: none; /* Hide score if needed */
+}
+
+/* Increased size and adjustments for tablet and desktop */
+@media (min-width: 641px) {
+    .grid-item {
+        font-size: 28px; /* Larger font size for desktop */
+        width: 80px; /* Increase width for grid items */
+        height: 80px; /* Increase height for grid items */
+    }
+
+    h1 {
+        font-size: 3rem; /* Larger heading size for desktop */
+    }
+
+    h2 {
+        font-size: 2rem; /* Larger subheading size for desktop */
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 640px) {
+    h1 {
+        font-size: 2.5rem; /* Smaller heading size */
+    }
+    h2 {
+        font-size: 1.5rem; /* Smaller subheading size */
+    }
+
+    /* The grid remains 4 columns on small screens */
+    .grid-container {
+        grid-template-columns: repeat(4, 1fr); /* Maintain 4 columns */
+    }
+
+    /* Adjust padding and margins for smaller screens */
+    .p-5 {
+        padding: 1.25rem;
+    }
+
+    .gap-2 {
+        gap: 0.5rem;
+    }
+}
