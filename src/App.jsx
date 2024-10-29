@@ -130,7 +130,7 @@ const FruitGame = () => {
 
     return (
         <div className='bg-gray-800 min-h-screen flex flex-col items-center p-3 text-white'>
-            <h1 className='text-3xl font-bold mb-3'>Mine Game</h1>
+            <h1 className='text-3xl font-bold mb-3'>moneyGain</h1>
             <div className='flex flex-col items-center mb-4'>
                 <h2 className='text-xl mb-1'>Balance: Rs. {balance}</h2>
                 <div className='flex flex-row p-1 gap-1'>
