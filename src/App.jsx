@@ -64,18 +64,27 @@ const FruitGame = () => {
     };
 
     const calculateMultiplier = () => {
+        let multiplier;
+    
         if (totalFruits === 1) {
-            return 1.1;
+            multiplier = 1.1;
         } else if (totalFruits === 24) {
-            return 6;
+            multiplier = 6;
         } else {
-            return 1.1 + ((totalFruits - 1) / 23) * (6 - 1.1);
+            multiplier = 1.1 + ((totalFruits - 1) / 23) * (6 - 1.1);
         }
+    
+        // Round up to 2 decimal places
+        return Math.ceil(multiplier * 100) / 100;
     };
 
     const calculateWinnings = (currentScore) => {
         const multiplier = calculateMultiplier();
-        return currentScore > 0 ? (Number(betAmount) * currentScore * multiplier) : 0;
+        // Calculate the winnings
+        const winnings = currentScore > 0 ? (Number(betAmount) * currentScore * multiplier) : 0;
+        
+        // Round up to 2 decimal places
+        return Math.ceil(winnings * 100) / 100;
     };
 
     const handleGridClick = (index) => {
@@ -102,8 +111,13 @@ const FruitGame = () => {
 
     const handleTotalFruitsChange = (e) => {
         const value = Number(e.target.value);
+        // Check if the value is a valid number and is within the acceptable range
         if (value > 0 && value < totalGrids) {
             setTotalFruits(value);
+        } else if (value <= 0) {
+            setTotalFruits(""); // Ensure at least 1 fruit is set
+        } else if (value >= totalGrids) {
+            setTotalFruits(totalGrids - 1); // Ensure it doesn't exceed total grids
         }
     };
 
