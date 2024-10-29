@@ -15,6 +15,8 @@ const FruitGame = () => {
     const [winnings, setWinnings] = useState(0);
     const [totalFruits, setTotalFruits] = useState(1);
     const [showWinCard, setShowWinCard] = useState(false);
+    const [showCashoutMessage, setShowCashoutMessage] = useState(false);
+    const [selectedGrids, setSelectedGrids] = useState(0);
 
     const handleAmount = (e) => {
         setAmount(e.target.value);
@@ -61,11 +63,13 @@ const FruitGame = () => {
             }
         }
         setMinePositions(positions);
+        setSelectedGrids(0);
+        setShowCashoutMessage(false);
     };
 
     const calculateMultiplier = () => {
         let multiplier;
-    
+
         if (totalFruits === 1) {
             multiplier = 1.1;
         } else if (totalFruits === 24) {
@@ -73,17 +77,13 @@ const FruitGame = () => {
         } else {
             multiplier = 1.1 + ((totalFruits - 1) / 23) * (6 - 1.1);
         }
-    
-        // Round up to 2 decimal places
+
         return Math.ceil(multiplier * 100) / 100;
     };
 
     const calculateWinnings = (currentScore) => {
         const multiplier = calculateMultiplier();
-        // Calculate the winnings
         const winnings = currentScore > 0 ? (Number(betAmount) * currentScore * multiplier) : 0;
-        
-        // Round up to 2 decimal places
         return Math.ceil(winnings * 100) / 100;
     };
 
@@ -96,8 +96,10 @@ const FruitGame = () => {
             return newRevealed;
         });
 
+        setSelectedGrids((prev) => prev + 1);
+
         if (minePositions.includes(index)) {
-            setGameOver(true); // Game Over on hitting a mine
+            setGameOver(true);
             setWinnings(0);
         } else {
             setScore((prevScore) => {
@@ -111,19 +113,25 @@ const FruitGame = () => {
 
     const handleTotalFruitsChange = (e) => {
         const value = Number(e.target.value);
-        // Check if the value is a valid number and is within the acceptable range
         if (value > 0 && value < totalGrids) {
             setTotalFruits(value);
         } else if (value <= 0) {
-            setTotalFruits(""); // Ensure at least 1 fruit is set
+            setTotalFruits("");
         } else if (value >= totalGrids) {
-            setTotalFruits(totalGrids - 1); // Ensure it doesn't exceed total grids
+            setTotalFruits(totalGrids - 1);
         }
     };
 
     const handleCashout = () => {
         if (gameOver) {
-            alert('You cannot cash out after the game is over.');
+            return; // Exit if game is over
+        }
+
+        if (selectedGrids === 0) {
+            setShowCashoutMessage(true);
+            setTimeout(() => {
+                setShowCashoutMessage(false); // Hide message after 2 seconds
+            }, 2000); // 2000 milliseconds = 2 seconds
             return;
         }
 
@@ -132,14 +140,19 @@ const FruitGame = () => {
         setGameOver(true);
         setBetStatus(false);
         setWinnings(totalWinnings);
-        setShowWinCard(true); // Show the win card
+        setShowWinCard(true);
+        setShowCashoutMessage(false);
     };
 
     const handleRestart = () => {
         setBetStatus(false);
         setWinnings(0);
-        setShowWinCard(false); // Hide the win card when restarting
+        setShowWinCard(false);
         initializeGame();
+    };
+
+    const closeWinCard = () => {
+        setShowWinCard(false); // Close the congratulations card
     };
 
     return (
@@ -163,12 +176,11 @@ const FruitGame = () => {
                     </button>
                 </div>
             </div>
-             <div className='flex justify-center items-center'>
-             <h2 className='text-lg mb-1 score'>Score: {score}</h2>
-             <h2 className='text-lg mb-2'>Winnings: Rs. {winnings}</h2>
-                
-             </div>
-            
+            <div className='flex justify-center items-center'>
+                <h2 className='text-lg mb-1 score'>Score: {score}</h2>
+                <h2 className='text-lg mb-2'>Winnings: Rs. {winnings}</h2>
+            </div>
+
             <div className='grid grid-cols-5 gap-2 mb-3'>
                 {Array.from({ length: totalGrids }, (_, index) => (
                     <div
@@ -177,8 +189,8 @@ const FruitGame = () => {
                         onClick={() => handleGridClick(index)}
                     >
                         {revealedGrids[index] && (minePositions.includes(index) ?
-                            <span className='text-red-500 text-3xl'>💣</span> // Mine icon
-                            : <span className='text-green-500 text-3xl'>🍏</span> // Fruit icon
+                            <span className='text-red-500 text-3xl'>💣</span>
+                            : <span className='text-green-500 text-3xl'>🍏</span>
                         )}
                     </div>
                 ))}
@@ -206,7 +218,7 @@ const FruitGame = () => {
                     onChange={handleBettingAmount}
                     className='border border-gray-400 p-1 w-36 rounded bg-gray-700 text-white text-sm'
                 />
-                {!gameOver && !betStatus && (  // Show Bet button before betting and only if game is not over
+                {!gameOver && !betStatus && (
                     <button
                         onClick={handleBetStatus}
                         className='bg-blue-500 text-white p-1 rounded hover:bg-blue-600 transition text-sm'
@@ -214,12 +226,12 @@ const FruitGame = () => {
                         Bet
                     </button>
                 )}
-                {betStatus && !gameOver && (  // Show Cashout button after betting
+                {betStatus && (
                     <button
                         onClick={handleCashout}
                         className='bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600 transition text-sm'
                     >
-                        Cashout
+                        Cash Out
                     </button>
                 )}
                 {gameOver && (
@@ -232,19 +244,22 @@ const FruitGame = () => {
                 )}
             </div>
 
-            {/* Winning Card */}
             {showWinCard && (
-                <div className='fixed inset-0 flex justify-center items-center bg-black bg-opacity-75 z-50'>
-                    <div className='bg-gray-800 p-5 rounded-lg shadow-lg w-11/12 max-w-md'>
-                        <h2 className='text-2xl font-bold mb-2'>You Won!</h2>
-                        <p className='text-lg'>Amount: Rs. {winnings}</p>
-                        <button
-                            onClick={() => setShowWinCard(false)} // Hide card on button click
-                            className='mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition'
-                        >
-                            Close
-                        </button>
-                    </div>
+                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-700 p-4 rounded h-48 flex flex-col justify-center items-center w-64'>
+                    <h2 className='text-lg'>Congratulations!</h2>
+                    <p>Your Winnings: Rs. {winnings}</p>
+                    <button
+                        onClick={closeWinCard}
+                        className='mt-2 bg-red-500 text-white p-1 rounded hover:bg-red-600 transition'
+                    >
+                        Close
+                    </button>
+                </div>
+            )}
+            {showCashoutMessage && (  // Show the cashout message card if condition is met
+                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-700 p-4 rounded h-48 flex flex-col justify-center items-center w-64'>
+                    <h2 className='text-lg text-red-500'>Cashout Failed</h2>
+                    <p className='text-white'>Please select at least one grid before cashing out.</p>
                 </div>
             )}
         </div>
