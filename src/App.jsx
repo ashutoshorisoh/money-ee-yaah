@@ -25,7 +25,10 @@ const FruitGame = () => {
     const addAmount = () => {
         const numAmount = Number(amount);
         if (!isNaN(numAmount) && numAmount > 0) {
-            setBalance((prevBalance) => prevBalance + numAmount);
+            // Round to 2 decimal places
+            const roundedAmount = Number(numAmount.toFixed(2));
+            
+            setBalance((prevBalance) => prevBalance + roundedAmount);
             setAmount('');
         } else {
             alert('Please enter a valid number greater than 0');
@@ -131,7 +134,7 @@ const FruitGame = () => {
             setShowCashoutMessage(true);
             setTimeout(() => {
                 setShowCashoutMessage(false); // Hide message after 2 seconds
-            }, 2000); // 2000 milliseconds = 2 seconds
+            }, 1000); // 2000 milliseconds = 2 seconds
             return;
         }
 
@@ -226,7 +229,7 @@ const FruitGame = () => {
                         Bet
                     </button>
                 )}
-                {betStatus && (
+                {betStatus && !gameOver && (
                     <button
                         onClick={handleCashout}
                         className='bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600 transition text-sm'
